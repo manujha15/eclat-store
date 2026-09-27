@@ -1,0 +1,18 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<div class="container" style="max-width:640px;text-align:center;">
+  <h1 class="section-title">Payment <em>Received</em></h1>
+  <p class="section-sub">Order #{{ order.id }} is now paid</p>
+
+  <p style="color:var(--muted);line-height:1.8;margin-bottom:32px;">
+    Thank you, {{ order.full_name }}.<br>
+    We'll ship your order to {{ order.address }}, {{ order.city }} {{ order.pincode }}.<br>
+    A confirmation has been sent to {{ order.email }}.
+  </p>
+
+  <a href="{% url 'store:product_list' %}" class="btn">Continue Shopping</a>
+  <a href="{% url 'store:my_orders' %}" style="margin-left:16px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">
+    View All Orders
+  </a>
+</div>
+{% endblock %}

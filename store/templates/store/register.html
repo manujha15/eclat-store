@@ -1,0 +1,24 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<div class="container" style="max-width:480px;">
+  <h1 class="section-title" style="font-size:36px;">Create <em>Account</em></h1>
+  <p class="section-sub">Join ÉCLAT</p>
+
+  <form method="post" style="display:flex;flex-direction:column;gap:18px;">
+    {% csrf_token %}
+    <input name="username" placeholder="Username" required
+           style="padding:14px 18px;border:1px solid var(--line);border-radius:4px;font-family:inherit;font-size:14px;">
+    <input name="email" type="email" placeholder="Email" required
+           style="padding:14px 18px;border:1px solid var(--line);border-radius:4px;font-family:inherit;font-size:14px;">
+    <input name="password" type="password" placeholder="Password" required
+           style="padding:14px 18px;border:1px solid var(--line);border-radius:4px;font-family:inherit;font-size:14px;">
+    <input name="password2" type="password" placeholder="Confirm Password" required
+           style="padding:14px 18px;border:1px solid var(--line);border-radius:4px;font-family:inherit;font-size:14px;">
+    <button type="submit" class="btn">Create Account</button>
+  </form>
+
+  <p style="text-align:center;margin-top:24px;font-size:13px;color:var(--muted);">
+    Already have an account? <a href="{% url 'store:login' %}" style="color:var(--gold);">Log in</a>
+  </p>
+</div>
+{% endblock %}

@@ -1,0 +1,1 @@
+web: gunicorn one8_project.wsgi --log-file -

@@ -1,0 +1,75 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<div class="container">
+  <h1 class="section-title">Your <em>Cart</em></h1>
+  <p class="section-sub">{{ cart.items.count }} item{{ cart.items.count|pluralize }} in your bag</p>
+
+  {% if cart.items.all %}
+    <div style="display:grid;grid-template-columns:1fr 360px;gap:48px;align-items:start;">
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th><th>Option</th><th>Price</th><th>Qty</th><th>Subtotal</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in cart.items.all %}
+              <tr>
+                <td>
+                  <div style="display:flex;align-items:center;gap:16px;">
+                    {% if item.variant.product.image %}
+                      <img src="{{ item.variant.product.image.url }}" alt="" style="width:60px;height:75px;object-fit:cover;border-radius:4px;">
+                    {% endif %}
+                    <span>{{ item.variant.product.name }}</span>
+                  </div>
+                </td>
+                <td>{{ item.variant.size }} · {{ item.variant.color }}</td>
+                <td>₹{{ item.variant.get_price }}</td>
+                <td>
+                  <div style="display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:40px;overflow:hidden;">
+                    <a href="{% url 'store:decrease_quantity' item.id %}"
+                       style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;text-decoration:none;color:var(--ink);font-size:16px;">−</a>
+                    <span style="min-width:32px;text-align:center;font-size:13px;">{{ item.quantity }}</span>
+                    <a href="{% url 'store:increase_quantity' item.id %}"
+                       style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;text-decoration:none;color:var(--ink);font-size:16px;">+</a>
+                  </div>
+                </td>
+                <td>₹{{ item.subtotal }}</td>
+                <td><a href="{% url 'store:remove_from_cart' item.id %}" class="remove-link">Remove</a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div style="position:sticky;top:100px;padding:32px;background:#fff;border:1px solid var(--line);border-radius:8px;">
+        <h3 style="font-family:'Fraunces',serif;font-size:20px;font-weight:400;margin-bottom:24px;">Order Summary</h3>
+        <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);font-size:13px;">
+          <span style="color:var(--muted);">Subtotal</span>
+          <span>₹{{ cart.total }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);font-size:13px;">
+          <span style="color:var(--muted);">Shipping</span>
+          <span style="color:var(--gold);">FREE</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:20px 0;font-family:'Fraunces',serif;font-size:22px;font-weight:500;">
+          <span>Total</span>
+          <span>₹{{ cart.total }}</span>
+        </div>
+        <a href="{% url 'store:checkout' %}" class="btn" style="display:block;text-align:center;width:100%;padding:16px;background:#1a1310;color:#fbf7f2;border-color:#1a1310;">
+          Proceed to Checkout
+        </a>
+        <a href="{% url 'store:product_list' %}" style="display:block;text-align:center;margin-top:16px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">
+          Continue Shopping
+        </a>
+      </div>
+    </div>
+  {% else %}
+    <div style="text-align:center;padding:80px 0;">
+      <p style="color:var(--muted);font-size:15px;margin-bottom:32px;">Your cart is empty.</p>
+      <a href="{% url 'store:product_list' %}" class="btn">Browse Collection</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

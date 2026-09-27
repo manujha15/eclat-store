@@ -1,0 +1,62 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<div class="container">
+
+  <h1 class="section-title">
+    {% if category %}{{ category.name }}
+    {% elif q %}Results for "{{ q }}"
+    {% else %}All <em>Products</em>{% endif %}
+  </h1>
+  <p class="section-sub">Beauty, distilled</p>
+
+  <div class="categories">
+    <a href="{% url 'store:product_list' %}">All</a>
+    {% for c in categories %}
+      <a href="{% url 'store:category_products' c.slug %}">{{ c.name }}</a>
+    {% endfor %}
+  </div>
+
+  <form method="get" style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;align-items:center;margin-bottom:48px;padding:20px;border:1px solid var(--line);border-radius:6px;background:#fff;">
+    {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+    <label style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">
+      Price
+      <input type="number" name="min" placeholder="Min" value="{{ min_price }}"
+             style="margin-left:8px;padding:8px 12px;border:1px solid var(--line);border-radius:4px;width:80px;font-family:inherit;">
+    </label>
+    <input type="number" name="max" placeholder="Max" value="{{ max_price }}"
+           style="padding:8px 12px;border:1px solid var(--line);border-radius:4px;width:80px;font-family:inherit;">
+
+    <label style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">
+      Sort
+      <select name="sort" style="margin-left:8px;padding:8px 12px;border:1px solid var(--line);border-radius:4px;font-family:inherit;">
+        <option value="">Newest</option>
+        <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Price ↑</option>
+        <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Price ↓</option>
+      </select>
+    </label>
+
+    <button type="submit" class="btn" style="padding:10px 24px;font-size:10px;">Apply</button>
+    <a href="{% if category %}{% url 'store:category_products' category.slug %}{% else %}{% url 'store:product_list' %}{% endif %}"
+       style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">Reset</a>
+  </form>
+
+  <div class="grid">
+    {% for p in products %}
+      <a href="{% url 'store:product_detail' p.slug %}">
+        <div class="card">
+          <div class="card-image">
+            {% if p.image %}<img src="{{ p.image.url }}" alt="{{ p.name }}">{% endif %}
+          </div>
+          <div class="brand">{{ p.brand }}</div>
+          <h3>{{ p.name }}</h3>
+          <div class="price">₹{{ p.base_price }}</div>
+        </div>
+      </a>
+    {% empty %}
+      <p style="grid-column:1/-1;text-align:center;color:#8a7a70;">
+        No products match your search.
+      </p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

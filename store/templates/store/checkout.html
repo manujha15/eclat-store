@@ -1,0 +1,67 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<div class="container" style="max-width:960px;">
+  <h1 class="section-title">Check<em>out</em></h1>
+  <p class="section-sub">Complete your order</p>
+
+  <div style="display:grid;grid-template-columns:1fr 380px;gap:48px;align-items:start;">
+
+    <form method="post" style="display:flex;flex-direction:column;gap:16px;">
+      {% csrf_token %}
+
+      <h3 style="font-family:'Fraunces',serif;font-size:18px;font-weight:400;margin-bottom:8px;">Shipping Details</h3>
+
+      <input name="full_name" placeholder="Full Name" required
+             style="padding:14px 18px;border:1px solid var(--line);border-radius:4px;font-family:inherit;">
+      <input name="email" type="email" placeholder="Email" required
+             style="padding:14px 18px;border:1px solid var(--line);border-radius:4px;font-family:inherit;">
+      <input name="phone" placeholder="Phone" required
+             style="padding:14px 18px;border:1px solid var(--line);border-radius:4px;font-family:inherit;">
+      <textarea name="address" placeholder="Address" required rows="3"
+                style="padding:14px 18px;border:1px solid var(--line);border-radius:4px;font-family:inherit;resize:vertical;"></textarea>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        <input name="city" placeholder="City" required
+               style="padding:14px 18px;border:1px solid var(--line);border-radius:4px;font-family:inherit;">
+        <input name="state" placeholder="State" required
+               style="padding:14px 18px;border:1px solid var(--line);border-radius:4px;font-family:inherit;">
+        <input name="pincode" placeholder="Pincode" required
+               style="padding:14px 18px;border:1px solid var(--line);border-radius:4px;font-family:inherit;">
+      </div>
+
+      <h3 style="font-family:'Fraunces',serif;font-size:18px;font-weight:400;margin-top:24px;margin-bottom:8px;">Coupon</h3>
+
+      <div style="padding:20px;border:1px dashed var(--gold);border-radius:8px;background:#fffaf2;">
+        <input name="coupon_code" placeholder="Enter coupon code"
+               style="width:100%;padding:12px 16px;border:1px solid var(--line);border-radius:4px;font-family:inherit;font-size:14px;">
+        <p style="font-size:11px;color:var(--muted);margin-top:10px;letter-spacing:0.5px;">
+          Available: <strong>WELCOME10</strong> (10% off) · <strong>BEAUTY20</strong> (20% off over ₹2000)
+        </p>
+      </div>
+
+      <button type="submit" class="btn" style="margin-top:16px;padding:18px;background:#1a1310;color:#fbf7f2;border-color:#1a1310;">
+        Place Order · ₹{{ cart.total }}
+      </button>
+    </form>
+
+    <div style="position:sticky;top:100px;padding:28px;background:#fff;border:1px solid var(--line);border-radius:8px;">
+      <h3 style="font-family:'Fraunces',serif;font-size:18px;font-weight:400;margin-bottom:20px;">Order Summary</h3>
+
+      {% for item in cart.items.all %}
+        <div style="display:flex;justify-content:space-between;padding:10px 0;font-size:13px;border-bottom:1px solid var(--line);">
+          <span>{{ item.quantity }} × {{ item.variant.product.name }}</span>
+          <span>₹{{ item.subtotal }}</span>
+        </div>
+      {% endfor %}
+
+      <div style="display:flex;justify-content:space-between;padding:16px 0;font-family:'Fraunces',serif;font-size:20px;font-weight:500;">
+        <span>Total</span>
+        <span>₹{{ cart.total }}</span>
+      </div>
+      <p style="font-size:11px;color:var(--muted);letter-spacing:1px;">
+        Discount will be applied after coupon validation.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

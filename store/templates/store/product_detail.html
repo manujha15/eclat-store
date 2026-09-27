@@ -1,0 +1,179 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<div class="product-detail">
+  <div>
+    <div class="gallery-main" id="gallery-main">
+      {% if product.image %}
+        <img id="main-media" src="{{ product.image.url }}" alt="{{ product.name }}">
+      {% else %}
+        <div style="aspect-ratio:4/5;background:#f3ded3;"></div>
+      {% endif %}
+    </div>
+
+    <div class="gallery-thumbs">
+      {% if product.image %}
+        <div class="thumb active" onclick="swapMedia('{{ product.image.url }}', 'image', this)">
+          <img src="{{ product.image.url }}" alt="">
+        </div>
+      {% endif %}
+      {% for m in product.media.all %}
+        <div class="thumb" onclick="swapMedia('{{ m.file.url }}', '{{ m.media_type }}', this)">
+          {% if m.media_type == 'video' %}
+            <video muted><source src="{{ m.file.url }}" type="video/mp4"></video>
+          {% else %}
+            <img src="{{ m.file.url }}" alt="{{ m.caption }}">
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div>
+    <div class="brand">{{ product.brand }}</div>
+    <h1>{{ product.name }}</h1>
+
+    {% if product.average_rating %}
+      <div style="margin-bottom:16px;color:var(--gold);font-size:14px;letter-spacing:1px;">
+        {{ product.average_rating }} ★ · {{ product.review_count }} review{{ product.review_count|pluralize }}
+      </div>
+    {% endif %}
+
+    <div class="price">₹{{ product.base_price }}</div>
+
+    <p class="desc">{{ product.description }}</p>
+
+    <div class="option-label">Select Option</div>
+
+    <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:40px;">
+      {% for v in product.variants.all %}
+        {% if v.stock > 0 %}
+          <div style="padding:20px;border:1px solid var(--line);border-radius:8px;background:#fff;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+              <div>
+                <div style="font-family:'Fraunces',serif;font-size:18px;">{{ v.size }}</div>
+                <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:2px;">
+                  {{ v.color }} · {{ v.stock }} in stock
+                </div>
+              </div>
+              <div style="font-size:16px;font-weight:500;color:var(--gold);">
+                ₹{{ v.get_price }}
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;">
+              <form method="post" action="{% url 'store:add_to_cart' v.id %}" style="flex:1;">
+                {% csrf_token %}
+                <button type="submit" class="size-btn" style="width:100%;padding:14px;border-radius:40px;">
+                  Add to Cart
+                </button>
+              </form>
+              <a href="{% url 'store:buy_now' v.id %}"
+                 style="flex:1;padding:14px;border-radius:40px;background:#1a1310;color:#fbf7f2;border:1px solid #1a1310;text-align:center;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:500;transition:all 0.25s;">
+                Buy Now
+              </a>
+            </div>
+          </div>
+        {% else %}
+          <div style="padding:16px 20px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);font-size:12px;letter-spacing:2px;text-transform:uppercase;">
+            {{ v.size }} · Sold out
+          </div>
+        {% endif %}
+      {% empty %}
+        <p style="color:#8a7a70;">No options available.</p>
+      {% endfor %}
+    </div>
+
+    {% if user.is_authenticated %}
+      <a href="{% url 'store:toggle_wishlist' product.id %}"
+         style="display:inline-block;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">
+        {% if in_wishlist %}♥ In wishlist{% else %}♡ Add to wishlist{% endif %}
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- REVIEWS -->
+<div class="container" style="padding-top:60px;border-top:1px solid var(--line);">
+  <h2 class="section-title" style="font-size:32px;">Customer <em>Reviews</em></h2>
+
+  {% if user.is_authenticated %}
+    <form method="post" action="{% url 'store:add_review' product.slug %}"
+          style="max-width:600px;margin:0 auto 48px;display:flex;flex-direction:column;gap:14px;">
+      {% csrf_token %}
+      <label style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">
+        Your rating
+        <select name="rating" required style="margin-left:12px;padding:8px 12px;border:1px solid var(--line);border-radius:4px;font-family:inherit;">
+          {% for i in "12345" %}
+            <option value="{{ i }}" {% if user_review and user_review.rating|stringformat:"s" == i %}selected{% endif %}>{{ i }} ★</option>
+          {% endfor %}
+        </select>
+      </label>
+      <textarea name="comment" rows="3" placeholder="Share your experience…"
+                style="padding:14px 18px;border:1px solid var(--line);border-radius:4px;font-family:inherit;font-size:14px;">{{ user_review.comment|default:'' }}</textarea>
+      <button type="submit" class="btn" style="align-self:flex-start;">
+        {% if user_review %}Update Review{% else %}Submit Review{% endif %}
+      </button>
+    </form>
+  {% else %}
+    <p style="text-align:center;color:var(--muted);margin-bottom:32px;">
+      <a href="{% url 'store:login' %}" style="color:var(--gold);">Log in</a> to write a review.
+    </p>
+  {% endif %}
+
+  <div style="max-width:800px;margin:0 auto;">
+    {% for r in reviews %}
+      <div style="border-bottom:1px solid var(--line);padding:20px 0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <strong style="font-size:14px;">{{ r.user.username }}</strong>
+          <span style="color:var(--gold);font-size:13px;letter-spacing:1px;">
+            {% for i in "12345" %}{% if forloop.counter <= r.rating %}★{% else %}☆{% endif %}{% endfor %}
+          </span>
+        </div>
+        <p style="font-size:14px;line-height:1.7;color:#4a4038;">{{ r.comment }}</p>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:1px;">
+          {{ r.created_at|date:"d M Y" }}
+        </div>
+      </div>
+    {% empty %}
+      <p style="text-align:center;color:var(--muted);">No reviews yet. Be the first.</p>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- RELATED PRODUCTS -->
+{% if related %}
+<div class="container" style="padding-top:80px;">
+  <h2 class="section-title" style="font-size:32px;">You May Also <em>Like</em></h2>
+  <p class="section-sub">From the same collection</p>
+
+  <div class="grid">
+    {% for p in related %}
+      <a href="{% url 'store:product_detail' p.slug %}">
+        <div class="card">
+          <div class="card-image">
+            {% if p.image %}<img src="{{ p.image.url }}" alt="{{ p.name }}">{% endif %}
+          </div>
+          <div class="brand">{{ p.brand }}</div>
+          <h3>{{ p.name }}</h3>
+          <div class="price">₹{{ p.base_price }}</div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<script>
+function swapMedia(url, type, el) {
+  const main = document.getElementById('gallery-main');
+  document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+
+  if (type === 'video') {
+    main.innerHTML = `<video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;">
+      <source src="${url}" type="video/mp4"></video>`;
+  } else {
+    main.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+  }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<div class="container">
+  <h1 class="section-title">Your <em>Orders</em></h1>
+  <p class="section-sub">Order history</p>
+
+  {% for order in orders %}
+    <div style="border:1px solid var(--line);border-radius:6px;padding:28px;margin-bottom:22px;background:#fff;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <strong style="font-family:'Fraunces',serif;font-size:20px;">Order #{{ order.id }}</strong>
+        {% if order.status == 'PENDING' %}
+          <span style="padding:6px 14px;background:#fdf0d8;color:#8a6d1a;font-size:10px;letter-spacing:2px;text-transform:uppercase;border-radius:20px;">Pending</span>
+        {% elif order.status == 'PAID' %}
+          <span style="padding:6px 14px;background:#d8ede4;color:#2c6b4b;font-size:10px;letter-spacing:2px;text-transform:uppercase;border-radius:20px;">Paid</span>
+        {% elif order.status == 'SHIPPED' %}
+          <span style="padding:6px 14px;background:#dbe8f5;color:#285c8f;font-size:10px;letter-spacing:2px;text-transform:uppercase;border-radius:20px;">Shipped</span>
+        {% elif order.status == 'DELIVERED' %}
+          <span style="padding:6px 14px;background:#e2f0d8;color:#3f6b24;font-size:10px;letter-spacing:2px;text-transform:uppercase;border-radius:20px;">Delivered</span>
+        {% else %}
+          <span style="padding:6px 14px;background:#f5d8d8;color:#8f2828;font-size:10px;letter-spacing:2px;text-transform:uppercase;border-radius:20px;">Cancelled</span>
+        {% endif %}
+      </div>
+
+      <div style="color:var(--muted);font-size:12px;letter-spacing:1px;margin-bottom:16px;">
+        {{ order.created_at|date:"d M Y" }} · ₹{{ order.total_amount }}
+      </div>
+
+      {% for item in order.items.all %}
+        <div style="font-size:13px;padding:4px 0;">{{ item.quantity }} × {{ item.product_name }} ({{ item.size }}, {{ item.color }})</div>
+      {% endfor %}
+    </div>
+  {% empty %}
+    <p style="text-align:center;color:var(--muted);">No orders yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}
