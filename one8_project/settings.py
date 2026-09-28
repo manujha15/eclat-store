@@ -1,6 +1,6 @@
 """
 Django settings for one8_project — ÉCLAT beauty store.
-Supports local MySQL and production PostgreSQL automatically.
+Supports local MySQL and production MySQL via DATABASE_URL.
 """
 
 import os
@@ -24,15 +24,14 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = os.environ.get(
     'ALLOWED_HOSTS',
-    '127.0.0.1,localhost,10.209.39.73'
+    '127.0.0.1,localhost,10.209.39.73,.vercel.app'
 ).split(',')
 
 CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000',
     'http://localhost:8000',
-    'https://*.onrender.com',
+    'https://*.vercel.app',
 ]
-
 
 # ---------- Apps ----------
 
@@ -75,7 +74,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'one8_project.wsgi.application'
+WSGI_APPLICATION = 'one8_project.wsgi.app'
 
 
 # ---------- Database ----------
@@ -88,8 +87,8 @@ if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.parse(
             DATABASE_URL,
-            conn_max_age=600,
-            conn_health_checks=True,
+            conn_max_age=0,          # Vercel serverless ke liye 0 zaroori hai
+            conn_health_checks=False,
         )
     }
 else:
