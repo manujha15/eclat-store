@@ -36,6 +36,7 @@ CSRF_TRUSTED_ORIGINS = [
 # ---------- Apps ----------
 
 INSTALLED_APPS = [
+    'django_tidb',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,7 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'store',
 ]
-
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -87,9 +88,17 @@ if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.parse(
             DATABASE_URL,
-            conn_max_age=0,          # Vercel serverless ke liye 0 zaroori hai
+            conn_max_age=0,
             conn_health_checks=False,
         )
+    }
+    DATABASES['default']['ENGINE'] = 'django_tidb'
+    
+    DATABASES['default']['OPTIONS'] = {
+        'ssl': {
+            'ca': str(BASE_DIR / 'certs' / 'isrgrootx1.pem'),
+        },
+        'charset': 'utf8mb4',
     }
 else:
     DATABASES = {
