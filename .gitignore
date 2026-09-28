@@ -26,3 +26,7 @@ staticfiles/
 # OS
 .DS_Store
 Thumbs.db
+
+# CA Certificate (needed in production)
+!certs/
+!certs/*
