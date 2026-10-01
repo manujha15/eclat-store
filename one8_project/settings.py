@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary_storage',
+    'cloudinary',   
     'store',
 ]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -142,8 +144,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # WhiteNoise only serves static files — media still uses default storage.
 # For production, see Cloudinary section in the guide.
-if not DEBUG:
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
 
 # ---------- Email ----------
@@ -162,7 +163,30 @@ SITE_TAGLINE = 'Beauty, distilled.'
 
 STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', '')
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', '')
+# ---------- Cloudinary (Media Files) ----------
 
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
+}
+
+
+HERO_VIDEO_URL = os.environ.get(
+    'HERO_VIDEO_URL',
+    'https://res.cloudinary.com/YOUR_CLOUD/video/upload/v.../hero.mp4'
+)
+
+# Vercel/production pe Cloudinary use karo
+if not DEBUG:
+    STORAGES = {
+        'default': {
+            'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage',
+        },
+        'staticfiles': {
+            'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        },
+    }
 
 # ---------- Uploads ----------
 

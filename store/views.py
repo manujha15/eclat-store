@@ -16,7 +16,6 @@ from .models import (
     Category, Product, ProductVariant, Cart, CartItem,
     Order, OrderItem, Review, Wishlist, Coupon,
 )
-
 # ---------- Helpers ----------
 
 def _get_cart(request):
@@ -34,10 +33,12 @@ def _get_cart(request):
 def home(request):
     categories = Category.objects.all()
     featured = Product.objects.filter(is_active=True)[:8]
+    new_arrivals = Product.objects.filter(is_active=True).order_by('-created_at')[:12]
     return render(request, 'store/home.html', {
         'categories': categories,
         'featured': featured,
-        'hero_video': '/media/hero/hero.mp4',
+        'new_arrivals': new_arrivals,
+        'hero_video': settings.HERO_VIDEO_URL,   # <-- yeh change
     })
 
 
