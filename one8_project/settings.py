@@ -174,7 +174,7 @@ CLOUDINARY_STORAGE = {
 
 HERO_VIDEO_URL = os.environ.get(
     'HERO_VIDEO_URL',
-    'https://res.cloudinary.com/YOUR_CLOUD/video/upload/v.../hero.mp4'
+    'https://res.cloudinary.com/ke9ebxr3/video/upload/v1790872109/hero/hero.mp4'
 )
 
 # Vercel/production pe Cloudinary use karo
